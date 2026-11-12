@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 const money = n => '₹' + Number(n || 0).toLocaleString('en-IN');
 const date = s => s ? new Date(`${s}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 async function call(path, { method = 'GET', body, token, query } = {}) {
-  const url = '/api' + path + (query ? `?${new URLSearchParams(query)}` : '');
+  const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const url = apiBase + '/api' + path + (query ? `?${new URLSearchParams(query)}` : '');
   const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: body ? JSON.stringify(body) : undefined });
   const data = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(data.error || 'Request failed');

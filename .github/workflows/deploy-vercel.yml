@@ -13,6 +13,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Check Vercel credentials
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          missing=()
+          for key in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!key}" ]; then missing+=("$key"); fi
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "Missing GitHub Actions secret(s): ${missing[*]}"
+            echo "Add them in repository Settings > Secrets and variables > Actions, then rerun this workflow."
+            exit 1
+          fi
       - name: Install dependencies
         run: npm install && npm --prefix client install
       - name: Install Vercel CLI
